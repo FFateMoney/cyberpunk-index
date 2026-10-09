@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-zh-title="赛博朋克指数" data-en-title="Cyberpunk Index">赛博朋克指数</title>
+<script src="lang.js"></script>
+<script src="names.js"></script>
+<script src="data/cpi.js"></script>
+<script src="common.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&family=ZCOOL+QingKe+HuangYou&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="cyber.css">
+<style>
+/* ---------- 首屏 ---------- */
+.hero{position:relative;max-width:1160px;margin:0 auto;padding:56px 16px 28px}
+.sun{position:absolute;right:max(16px,4%);top:26px;width:min(340px,42vw);aspect-ratio:1;border-radius:50%;z-index:-1;
+ background:linear-gradient(180deg,var(--yel) 0%,#ff8a3d 35%,var(--pink) 65%,var(--violet) 100%);
+ -webkit-mask-image:repeating-linear-gradient(180deg,#000 0 14px,transparent 14px 20px),linear-gradient(#000 45%,transparent 100%);
+ -webkit-mask-composite:source-in;mask-image:repeating-linear-gradient(180deg,#000 0 14px,transparent 14px 20px),linear-gradient(#000 45%,transparent 100%);
+ mask-composite:intersect;filter:drop-shadow(0 0 40px rgba(255,43,214,.6));opacity:.55}
+.kicker{font:13px var(--f-mono);letter-spacing:.24em;color:var(--cyan)}
+.kicker b{color:var(--yel);font-weight:400}
+.glitch{position:relative;display:inline-block;margin:10px 0 0;font:400 clamp(54px,12vw,132px)/1 var(--f-cn);letter-spacing:.04em;
+ background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+ filter:drop-shadow(0 0 22px rgba(255,43,214,.45)) drop-shadow(0 0 2px rgba(0,240,255,.8))}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;inset:0;background:none;pointer-events:none}
+.glitch::before{-webkit-text-fill-color:var(--cyan);opacity:.85;animation:gA 3.2s steps(1) infinite}
+.glitch::after{-webkit-text-fill-color:var(--pink);opacity:.85;animation:gB 2.7s steps(1) infinite}
+@keyframes gA{0%,86%,100%{clip-path:inset(0 0 100% 0);transform:none}
+ 87%{clip-path:inset(12% 0 62% 0);transform:translate(-6px,-2px)}89%{clip-path:inset(58% 0 20% 0);transform:translate(5px,1px)}
+ 91%{clip-path:inset(30% 0 48% 0);transform:translate(-3px,2px)}93%{clip-path:inset(80% 0 4% 0);transform:translate(4px,0)}}
+@keyframes gB{0%,78%,100%{clip-path:inset(0 0 100% 0);transform:none}
+ 79%{clip-path:inset(66% 0 14% 0);transform:translate(6px,1px)}81%{clip-path:inset(8% 0 76% 0);transform:translate(-5px,-1px)}
+ 83%{clip-path:inset(40% 0 40% 0);transform:translate(3px,2px)}}
+.sub{margin-top:4px;font:900 clamp(16px,3.4vw,30px) var(--f-disp);letter-spacing:.42em;color:transparent;-webkit-text-stroke:1px var(--cyan)}
+html[lang=en] .glitch{font:900 clamp(34px,8.6vw,96px)/1.05 var(--f-disp);letter-spacing:.02em}
+html[lang=en] .sub{font:400 clamp(18px,3.6vw,32px) var(--f-cn);letter-spacing:.5em}
+.sub b{color:var(--yel);-webkit-text-stroke:0;text-shadow:0 0 16px rgba(252,238,10,.6)}
+.lead{max-width:560px;margin:18px 0 0;font-size:18px;color:#d6c9ff}
+.lead strong{color:var(--pink);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.chip{font:14px var(--f-mono);padding:7px 14px;border:1px solid var(--line2);background:rgba(255,255,255,.03);
+ clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.chip.hl{border-color:var(--yel);color:var(--yel);box-shadow:inset 0 0 18px rgba(252,238,10,.15)}
+.chip b{color:var(--cyan);font-weight:400}.chip i{color:var(--pink);font-style:normal}
+
+/* ---------- 跑马灯 ---------- */
+.ticker{position:relative;overflow:hidden;white-space:nowrap;border-block:1px solid var(--line2);
+ background:linear-gradient(90deg,rgba(255,43,214,.12),rgba(0,240,255,.08),rgba(252,238,10,.1));font:14px var(--f-mono);letter-spacing:.1em}
+.ticker-in{display:inline-flex;gap:36px;padding:9px 0;animation:tick 48s linear infinite}
+.ticker:hover .ticker-in{animation-play-state:paused}
+.ticker span{color:var(--dim)}.ticker span b{color:var(--yel);font-weight:400;margin-right:6px}.ticker span em{font-style:normal;color:var(--pink);margin-left:6px}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+/* ---------- 主体 ---------- */
+.wrap{max-width:1160px;margin:0 auto;padding:28px 16px 40px;display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.years{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.yr,.play{font:600 15px var(--f-disp);letter-spacing:.06em;color:var(--dim);background:rgba(255,255,255,.04);border:1px solid var(--line2);
+ padding:7px 13px;cursor:pointer;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);transition:.18s}
+.yr:hover{color:var(--tx);border-color:var(--cyan)}
+.yr[aria-pressed=true]{color:#000;background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 20px rgba(0,240,255,.6)}
+.play{color:var(--pink);border-color:rgba(255,43,214,.55);font-size:13px}
+.play:hover,.play.on{background:var(--pink);color:#000}
+html:not([lang=en]) .play{font:700 14px var(--f-body);letter-spacing:.12em}
+.search{display:flex;align-items:center;gap:8px;min-width:min(300px,100%);flex:0 1 320px;padding:0 12px;
+ border:1px solid var(--line2);background:rgba(0,0,0,.35);transition:.2s}
+.search:focus-within{border-color:var(--pink);box-shadow:0 0 0 1px var(--pink),0 0 22px rgba(255,43,214,.35)}
+.search span{font:15px var(--f-mono);color:var(--pink);animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:.25}}
+.search input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--tx);font:500 16px var(--f-body);padding:10px 0;letter-spacing:.04em}
+.search input::placeholder{color:var(--mute)}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpi{padding:16px 18px 14px}
+.kpi .k{font:12px var(--f-mono);letter-spacing:.18em;color:var(--dim)}
+.kpi .v{margin-top:4px;font:700 34px/1.1 var(--f-disp);letter-spacing:.02em}
+.kpi .v small{font:500 14px var(--f-body);color:var(--dim);margin-left:4px;letter-spacing:0}
+.kpi:nth-child(1) .v{color:var(--cyan);text-shadow:0 0 18px rgba(0,240,255,.55)}
+.kpi:nth-child(2) .v{color:var(--tx)}
+.kpi:nth-child(3) .v{color:var(--pink);text-shadow:0 0 18px rgba(255,43,214,.55)}
+.kpi:nth-child(4) .v{color:var(--yel);text-shadow:0 0 18px rgba(252,238,10,.45)}
+.kpi .d{margin-top:4px;font-size:13px;color:var(--mute)}
+
+/* 领奖台 */
+.podium{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:14px}
+.pod{padding:20px 22px;overflow:hidden;cursor:pointer;transition:transform .25s}
+.pod:hover{transform:translateY(-3px)}
+.pod .rk{position:absolute;right:14px;top:-14px;font:900 96px/1 var(--f-disp);color:transparent;-webkit-text-stroke:1px var(--c);opacity:.35;z-index:-1}
+.pod .lbl{font:12px var(--f-mono);letter-spacing:.2em;color:var(--c)}
+.pod .nm{margin-top:6px;font:700 24px/1.15 var(--f-disp);letter-spacing:.02em;overflow-wrap:anywhere}
+.pod .iso{font:13px var(--f-mono);color:var(--dim);letter-spacing:.2em}
+.pod .sc{margin-top:12px;font:900 44px/1 var(--f-disp);color:var(--c);text-shadow:0 0 22px var(--c)}
+.pod .sc small{font:500 13px var(--f-mono);color:var(--dim);margin-left:6px;text-shadow:none;letter-spacing:.12em}
+.pod .tl{display:flex;gap:16px;margin-top:12px;font:14px var(--f-mono);color:var(--dim)}
+.pod .tl b{color:var(--tx);font-weight:400}
+.pod:first-child .nm{font-size:30px}.pod:first-child .sc{font-size:60px}
+.pod.p1{--c:var(--yel)}.pod.p2{--c:var(--pink)}.pod.p3{--c:var(--cyan)}
+.pod.p1::before{background:linear-gradient(135deg,var(--yel),rgba(255,43,214,.5) 60%,rgba(252,238,10,.3))}
+
+/* 图表 */
+.legend{display:flex;align-items:center;gap:10px;font:12px var(--f-mono);color:var(--dim);letter-spacing:.1em}
+.legend .ramp{width:140px;height:8px;background:linear-gradient(90deg,#00f0ff,#8b5cff 40%,#ff2bd6 70%,#fcee0a);box-shadow:0 0 12px rgba(255,43,214,.5)}
+#chart{position:relative}
+#chart svg{width:100%;height:auto;display:block;overflow:visible}
+.dot{transition:transform .9s cubic-bezier(.2,.8,.2,1),opacity .5s;cursor:pointer}
+.dot circle{transition:r .9s cubic-bezier(.2,.8,.2,1),fill .9s,stroke .9s,stroke-width .2s}
+.dot text{font:600 12px var(--f-body);fill:var(--tx);paint-order:stroke;stroke:#06020e;stroke-width:4px;stroke-linejoin:round;
+ opacity:0;transition:opacity .3s;pointer-events:none}
+.dot.lab text{opacity:1}
+.dot.off{opacity:0;pointer-events:none}
+.dot.dim{opacity:.12}
+.dot.hot circle{stroke:#fff;stroke-width:2.5}
+.dot.hot text{opacity:1;fill:var(--yel)}
+#chart.focus .dot:not(.hot){opacity:.18}
+.note{margin-top:10px;font-size:13px;color:var(--dim);display:flex;flex-wrap:wrap;gap:6px 18px}
+.note b{color:var(--pink);font-weight:600}
+
+/* 表格 */
+.tbl{overflow-x:auto;margin:0 -6px}
+table{width:100%;border-collapse:separate;border-spacing:0 4px;font-size:15px}
+th{font:500 12px var(--f-mono);letter-spacing:.14em;color:var(--dim);text-align:right;padding:6px 10px;cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--tx)}
+th.on{color:var(--cyan)}
+th.on::after{content:" ▼";font-size:10px}th.on.asc::after{content:" ▲"}
+th.l,td.l{text-align:left}
+td{padding:9px 10px;text-align:right;background:rgba(255,255,255,.025);border-block:1px solid transparent;transition:background .15s;white-space:nowrap}
+td:first-child{border-left:2px solid transparent}
+tbody tr{cursor:pointer}
+tbody tr:hover td,tbody tr.hot td{background:linear-gradient(90deg,rgba(255,43,214,.16),rgba(0,240,255,.06));border-color:rgba(255,43,214,.3)}
+tbody tr:hover td:first-child,tbody tr.hot td:first-child{border-left-color:var(--pink)}
+.rb{display:inline-grid;place-items:center;min-width:34px;height:26px;padding:0 4px;font:700 14px var(--f-disp);color:var(--dim);
+ clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);background:rgba(255,255,255,.06)}
+.r1 .rb{background:var(--yel);color:#000;box-shadow:0 0 14px var(--yel)}
+.r2 .rb{background:var(--pink);color:#000}
+.r3 .rb{background:var(--cyan);color:#000}
+.r4 .rb,.r5 .rb,.r6 .rb,.r7 .rb,.r8 .rb,.r9 .rb,.r10 .rb{color:var(--tx);background:rgba(139,92,255,.35)}
+.dl{font:13px var(--f-mono);text-align:center}
+.up{color:var(--lime)}.dn{color:var(--red)}.eq{color:var(--mute)}.nw{color:var(--yel)}
+.cn{font-weight:600;font-size:16px;letter-spacing:.02em}
+.cn a{color:inherit}.cn a:hover{color:var(--yel)}
+.cn small{font:12px var(--f-mono);color:var(--mute);margin-left:8px;letter-spacing:.12em}
+.num{font:15px var(--f-mono)}
+.mini{display:flex;align-items:center;justify-content:flex-end;gap:10px}
+.mini i{display:block;width:70px;height:4px;background:rgba(255,255,255,.08);position:relative}
+.mini i::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--w);background:var(--c);box-shadow:0 0 8px var(--c)}
+.cpi{display:flex;align-items:center;justify-content:flex-end;gap:12px}
+.cpi .bar{width:150px;height:10px;background:rgba(255,255,255,.06);position:relative;clip-path:polygon(0 0,100% 0,calc(100% - 5px) 100%,0 100%)}
+.cpi .bar::after{content:"";position:absolute;inset:0;width:var(--w);background:var(--grad);background-size:150px 100%}
+.cpi b{font:700 17px var(--f-disp);min-width:48px;color:var(--c)}
+.empty{text-align:center;color:var(--dim);padding:30px;font-family:var(--f-mono)}
+
+/* 浮层 */
+.tip{position:fixed;z-index:60;pointer-events:none;width:230px;padding:12px 14px;display:none;
+ background:rgba(8,3,20,.94);border:1px solid var(--cyan);box-shadow:0 0 0 1px rgba(0,240,255,.2),0 0 30px rgba(0,240,255,.25);
+ clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)}
+.tip .th{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font:700 15px var(--f-disp);letter-spacing:.03em}
+.tip .th span{font:12px var(--f-mono);color:var(--yel)}
+.tip .row{display:grid;grid-template-columns:34px 1fr 42px;gap:8px;align-items:center;margin-top:7px;font:13px var(--f-mono);color:var(--dim)}
+.tip .row i{display:block;height:4px;background:rgba(255,255,255,.08);position:relative}
+.tip .row i::after{content:"";position:absolute;inset:0;width:var(--w);background:var(--c);box-shadow:0 0 6px var(--c)}
+.tip .row b{color:var(--tx);font-weight:400;text-align:right}
+.tip .ft{margin-top:8px;padding-top:7px;border-top:1px dashed var(--line2);font:12px var(--f-mono);color:var(--dim)}
+
+@media (max-width:900px){
+ .kpis{grid-template-columns:repeat(2,1fr)}
+ .podium{grid-template-columns:1fr}
+ .pod:first-child .sc{font-size:48px}
+ .cpi .bar{width:90px}
+}
+@media (max-width:600px){
+ .hero{padding-top:36px}
+ .sun{opacity:.35;top:40px}
+ .kpi .v{font-size:26px}
+ .hide-s{display:none}
+ .mini i{display:none}
+ .cpi .bar{display:none}
+ td,th{padding:8px 6px}
+ .cn small{display:none}
+ td.cn{white-space:normal;font-size:15px;line-height:1.25}
+ .rb{min-width:28px}
+ .num{font-size:14px}
+ .cpi b{min-width:0;font-size:15px}
+ .search{flex:1 1 100%}
+}
+</style>
+</head>
+<body>
+<div class="fx-floor"></div>
+<div class="fx-scan"></div>
+
+<header class="top">
+ <a class="brand" href="index.html"><i class="mk"></i><span>CPI<em>://</em><span class="full">NET</span></span></a>
+ <div class="tr">
+  <nav class="nav"><a class="on" href="index.html"><span data-l="zh">榜单</span><span data-l="en">Ranking</span></a><a href="about.html"><span data-l="zh">指数说明</span><span data-l="en">Method</span></a></nav>
+  <div class="lang" role="group" aria-label="Language"><button data-lang="zh">中</button><button data-lang="en">EN</button></div>
+ </div>
+</header>
+
+<section class="hero">
+ <div class="sun"></div>
+ <div class="kicker">// HIGH TECH <b>×</b> LOW LIFE · <span id="span">2017—2023</span></div>
+ <h1 class="glitch" id="title" data-text="赛博朋克指数">赛博朋克指数</h1>
+ <div class="sub"><span data-l="zh">CYBERPUNK <b>INDEX</b></span><span data-l="en">赛博朋克<b>指数</b></span></div>
+ <p class="lead" data-l="zh">哪个国家最像赛博朋克？<strong>科技越先进</strong>、<strong>普通人的日子越难</strong>，得分就越高。两者缺一不可。</p>
+ <p class="lead" data-l="en">Which country looks most like a cyberpunk novel? The <strong>more advanced its tech</strong> and the <strong>harder ordinary life is</strong>, the higher it scores. It needs both.</p>
+ <div class="chips">
+  <span class="chip hl">CPI = √( T × L )</span>
+  <span class="chip"><b>T</b> <span data-l="zh">高科技 · 7 项指标</span><span data-l="en">High Tech · 7 indicators</span></span>
+  <span class="chip"><i>L</i> <span data-l="zh">低生活 · 8 项指标</span><span data-l="en">Low Life · 8 indicators</span></span>
+ </div>
+</section>
+
+<div class="ticker" aria-hidden="true"><div class="ticker-in" id="ticker"></div></div>
+
+<main class="wrap">
+ <div class="controls">
+  <div class="years" id="years"></div>
+  <label class="search"><span>&gt;_</span><input type="text" id="q" placeholder="搜索国家 / ISO3 代码…" autocomplete="off"></label>
+ </div>
+
+ <section class="kpis" id="kpis"></section>
+ <section class="podium" id="podium"></section>
+
+ <section class="cut">
+  <div class="ph">
+   <h2 class="h2"><i>01</i><span data-l="zh">象限图</span><span data-l="en">Quadrant Map</span> <small>T × L SCATTER</small></h2>
+   <div class="legend">CPI <span class="ramp"></span> HIGH</div>
+  </div>
+  <div id="chart"></div>
+  <div class="note" data-l="zh"><span>右上角 = 又高科技又低生活 = <b>最赛博朋克</b></span><span>点越大、越偏黄 = CPI 越高</span><span>虚线 = 等 CPI 线</span><span>点击国家 → <b>查看明细</b></span></div>
+  <div class="note" data-l="en"><span>Top right = high tech and low life = <b>most cyberpunk</b></span><span>Bigger, yellower dot = higher CPI</span><span>Dashed lines = equal CPI</span><span>Click a country → <b>see details</b></span></div>
+ </section>
+
+ <section class="cut">
+  <div class="ph">
+   <h2 class="h2"><i>02</i><span data-l="zh">排行榜</span><span data-l="en">Leaderboard</span> <small data-l="zh">LEADERBOARD</small><small data-l="en">排行榜</small></h2>
+   <span class="tag" id="count"></span>
+  </div>
+  <div class="tbl"><table>
+   <thead><tr>
+    <th data-k="rank" class="l">#</th>
+    <th data-k="d" class="hide-s">Δ</th>
+    <th data-k="country" class="l"><span data-l="zh">国家</span><span data-l="en">Country</span></th>
+    <th data-k="T">T<span class="hide-s"><span data-l="zh"> 高科技</span><span data-l="en"> High Tech</span></span></th>
+    <th data-k="L">L<span class="hide-s"><span data-l="zh"> 低生活</span><span data-l="en"> Low Life</span></span></th>
+    <th data-k="CPI">CPI</th>
+   </tr></thead>
+   <tbody id="tb"></tbody>
+  </table></div>
+ </section>
+</main>
+
+<footer class="foot">
+ <span data-l="zh">数据：世界银行、Our World in Data。各国取各快照年前 5 年内最新值。 <a href="about.html">指数定义、指标与局限 →</a></span>
+ <span data-l="en">Data: World Bank, Our World in Data. Each country uses its latest value within 5 years before the snapshot year. <a href="about.html">Definition, indicators &amp; limits →</a></span>
+ <span class="mono">SYS.OK // END OF TRANSMISSION</span>
+</footer>
+<div class="tip" id="tip"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const $years=$('years'),$q=$('q'),tb=$('tb'),chart=$('chart'),tip=$('tip');
+const {YEARS,MAXALL,col,esc}=window.CPI||{};
+let DATA={},year='',sortK='CPI',sortDir=-1,playing=null;
+
+/* ---------- 文案 ---------- */
+const I18N={
+ zh:{title:'赛博朋克指数',search:'搜索国家 / ISO3 代码…',play:'▶ 播放',stop:'■ 停止',
+  kpi:[['SNAPSHOT // 快照年份','','各国取前 5 年内最新值'],['NODES // 入榜国家','个','L 八项指标齐全才入榜'],
+   ['RED ZONE // 赛博朋克区','国','T ≥ 50 且 L ≥ 50'],['MEAN // 平均 CPI','','满分 100']],
+  pod:['#01 // 头号赛博朋克','#02 // 亚军','#03 // 季军'],
+  tick:(y,n)=>`快照 ${y} · ${n} 个节点在线`,count:(v,n,y)=>`${v} / ${n} 个国家 · ${y}`,
+  empty:'NO SIGNAL // 没有匹配的国家',vs:'较上年',isNew:'新',aria:'各国 T 与 L 散点图',
+  q:[['赛博朋克区','CYBERPUNK ZONE'],['废土','WASTELAND'],['科技乌托邦','UTOPIA'],['离线生活','OFFLINE']],
+  ax:['T · 高科技 →','L · 低生活 →']},
+ en:{title:'CYBERPUNK INDEX',search:'Search country / ISO3 code…',play:'▶ PLAY',stop:'■ STOP',
+  kpi:[['SNAPSHOT // 快照','','Latest value within 5 yrs'],['NODES // 入榜','','All 6 L indicators required'],
+   ['RED ZONE // 赛博朋克区','','T ≥ 50 and L ≥ 50'],['MEAN CPI // 均值','','Out of 100']],
+  pod:['#01 // MOST CYBERPUNK','#02 // RUNNER-UP','#03 // THIRD'],
+  tick:(y,n)=>`SNAPSHOT ${y} · ${n} NODES ONLINE`,count:(v,n,y)=>`${v} / ${n} NODES · ${y}`,
+  empty:'NO SIGNAL // no matching country',vs:'vs prev. year',isNew:'NEW',aria:'Scatter plot of T and L by country',
+  q:[['CYBERPUNK ZONE','赛博朋克区'],['WASTELAND','废土'],['TECH UTOPIA','科技乌托邦'],['OFFLINE','离线生活']],
+  ax:['T · HIGH TECH →','L · LOW LIFE →']}};
+const lg=()=>LANG.get(),S=()=>I18N[lg()];
+const nm=x=>CPI.name(x.iso);
+
+/* 数据来自 data/cpi.js（code/04_web.py 生成），名次沿用流水线结果 */
+function load(){
+ const d={};
+ YEARS.forEach(y=>d[y]=CPI.rows(y));
+ YEARS.forEach((y,i)=>{const prev=i?new Map(d[YEARS[i-1]].map(x=>[x.iso,x.rank])):null;
+  d[y].forEach(x=>{x.prev=prev?prev.get(x.iso):undefined;x.d=x.prev==null?null:x.prev-x.rank})});
+ DATA=d;year=YEARS.at(-1);
+ $('span').textContent=YEARS[0]+'—'+year;
+ $years.innerHTML=YEARS.map(y=>`<button class="yr" data-y="${y}">${y}</button>`).join('')+`<button class="play" id="play"></button>`;
+ $years.querySelectorAll('.yr').forEach(b=>b.onclick=()=>{stop();setYear(b.dataset.y)});
+ $('play').onclick=()=>playing?stop():play();
+ buildChart();applyLang();setYear(year);
+}
+
+/* 切换语言时：静态文案 + 图表底图 + 全部重绘 */
+function applyLang(){
+ const s=S(),h=$('title');
+ h.textContent=s.title;h.dataset.text=s.title;
+ $q.placeholder=s.search;
+ $('play').textContent=playing?s.stop:s.play;
+ $('kpis').innerHTML='';
+ chartBg();
+}
+document.addEventListener('langchange',()=>{applyLang();render()});
+
+// 中英文名和 ISO3 都能搜
+const matches=(x,q)=>!q||x.country.toLowerCase().includes(q)||x.iso.toLowerCase().includes(q)||CPI.zhName(x.iso).includes(q);
+const cur=()=>DATA[year]||[];
+
+function setYear(y){year=y;$years.querySelectorAll('.yr').forEach(b=>b.setAttribute('aria-pressed',b.dataset.y===y));render()}
+function play(){$('play').classList.add('on');$('play').textContent=S().stop;let i=YEARS.indexOf(year);
+ const step=()=>{i=(i+1)%YEARS.length;setYear(YEARS[i])};step();playing=setInterval(step,1700)}
+function stop(){if(!playing)return;clearInterval(playing);playing=null;$('play').classList.remove('on');$('play').textContent=S().play}
+
+function render(){
+ const d=cur(),q=$q.value.trim().toLowerCase();
+ kpis(d);podium(d);ticker(d);table(d,q);dots(d,q);
+}
+
+/* 数字滚动 */
+function countTo(el,to,dec){const from=+el.dataset.v||0;el.dataset.v=to;const t0=performance.now(),D=600;
+ const f=t=>{const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);el.textContent=(from+(to-from)*e).toFixed(dec);if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
+function kpis(d){
+ if(!$('kpis').children.length)$('kpis').innerHTML=S().kpi.map(([k,u,n],i)=>`<div class="cut kpi"><div class="k">${k}</div><div class="v"><span id="k${i}">0</span><small>${u}</small></div><div class="d">${n}</div></div>`).join('');
+ $('k0').textContent=year;
+ countTo($('k1'),d.length,0);
+ countTo($('k2'),d.filter(x=>x.T>=50&&x.L>=50).length,0);
+ countTo($('k3'),d.reduce((s,x)=>s+x.CPI,0)/d.length,1);
+}
+function podium(d){
+ const lb=S().pod;
+ $('podium').innerHTML=d.slice(0,3).map((x,i)=>`<div class="cut pod p${i+1}" data-iso="${x.iso}"><div class="rk">0${i+1}</div>
+  <div class="lbl">${lb[i]}</div><div class="nm">${esc(nm(x))}</div><div class="iso">${x.iso}</div>
+  <div class="sc">${x.CPI.toFixed(1)}<small>CPI</small></div>
+  <div class="tl"><span>T <b>${x.T.toFixed(1)}</b></span><span>L <b>${x.L.toFixed(1)}</b></span>${dHTML(x)}</div></div>`).join('');
+ $('podium').querySelectorAll('.pod').forEach(p=>{p.onclick=()=>go(p.dataset.iso);p.onmouseenter=()=>hot(p.dataset.iso);p.onmouseleave=()=>hot(null)});
+}
+function ticker(d){
+ const s=d.slice(0,12).map(x=>`<span><b>${String(x.rank).padStart(2,'0')}</b>${esc(lg()==='en'?nm(x).toUpperCase():nm(x))}<em>${x.CPI.toFixed(1)}</em></span>`).join('')
+  +`<span><b>//</b>${S().tick(year,d.length)}</span>`;
+ $('ticker').innerHTML=s+s;
+}
+function dHTML(x){if(x.d==null){const nw=x.prev===undefined&&year!==YEARS[0];return`<span class="${nw?'nw':'eq'}">${nw?S().isNew:'—'}</span>`}
+ return x.d>0?`<span class="up">▲${x.d}</span>`:x.d<0?`<span class="dn">▼${-x.d}</span>`:`<span class="eq">＝</span>`}
+
+function table(d,q){
+ let v=d.filter(x=>matches(x,q));
+ const coll=new Intl.Collator(lg()==='zh'?'zh-Hans-CN':'en');
+ v.sort((a,b)=>{if(sortK==='country')return coll.compare(nm(a),nm(b))*sortDir;
+  const A=a[sortK],B=b[sortK];if(A==null)return 1;if(B==null)return -1;return(A-B)*sortDir});
+ document.querySelectorAll('th').forEach(th=>{th.classList.toggle('on',th.dataset.k===sortK);th.classList.toggle('asc',sortDir>0)});
+ const mx=Math.max(...d.map(x=>x.CPI),1);
+ $('count').textContent=S().count(v.length,d.length,year);
+ tb.innerHTML=v.length?v.map(x=>`<tr class="r${x.rank}" data-iso="${x.iso}">
+  <td class="l"><span class="rb">${x.rank}</span></td>
+  <td class="dl hide-s">${dHTML(x)}</td>
+  <td class="l cn"><a href="${link(x.iso)}">${esc(nm(x))}</a><small>${x.iso}</small></td>
+  <td><div class="mini"><span class="num">${x.T.toFixed(1)}</span><i style="--w:${x.T}%;--c:var(--cyan)"></i></div></td>
+  <td><div class="mini"><span class="num">${x.L.toFixed(1)}</span><i style="--w:${x.L}%;--c:var(--pink)"></i></div></td>
+  <td><div class="cpi"><span class="bar" style="--w:${x.CPI/mx*100}%"></span><b style="--c:${col(x.CPI)}">${x.CPI.toFixed(1)}</b></div></td>
+ </tr>`).join(''):`<tr><td colspan="6" class="empty">${S().empty}</td></tr>`;
+ tb.querySelectorAll('tr[data-iso]').forEach(tr=>{tr.onmouseenter=()=>hot(tr.dataset.iso);tr.onmouseleave=()=>hot(null);
+  tr.onclick=e=>{if(!e.target.closest('a'))go(tr.dataset.iso)}});
+}
+
+/* ---------- 散点图（节点常驻，切年份时平滑移动；底图随语言重画） ---------- */
+const W=860,H=540,M={l:52,r:24,t:18,b:46},X=v=>M.l+v/100*(W-M.l-M.r),Y=v=>H-M.b-v/100*(H-M.t-M.b);
+const NS='http://www.w3.org/2000/svg',NODES=new Map();let dotsG;
+function buildChart(){
+ chart.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img">
+ <defs>
+  <linearGradient id="zone" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#ff2bd6" stop-opacity="0"/><stop offset="1" stop-color="#ff2bd6" stop-opacity=".22"/></linearGradient>
+  <linearGradient id="ax" x1="0" x2="1"><stop offset="0" stop-color="#00f0ff"/><stop offset="1" stop-color="#ff2bd6"/></linearGradient>
+  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ </defs><g id="bg"></g><g id="dots" filter="url(#glow)"></g></svg>`;
+ dotsG=chart.querySelector('#dots');
+}
+function chartBg(){
+ const L=S();chart.querySelector('svg').setAttribute('aria-label',L.aria);
+ let s=`<rect x="${X(50)}" y="${Y(100)}" width="${X(100)-X(50)}" height="${Y(50)-Y(100)}" fill="url(#zone)"/>
+ <rect x="${X(50)}" y="${Y(100)}" width="${X(100)-X(50)}" height="${Y(50)-Y(100)}" fill="none" stroke="#ff2bd6" stroke-opacity=".5" stroke-dasharray="2 5"/>`;
+ for(let i=0;i<=100;i+=10){const mj=i%50===0;
+  s+=`<line x1="${X(i)}" x2="${X(i)}" y1="${Y(0)}" y2="${Y(100)}" stroke="${mj?'#5b3fa8':'#2a1a52'}" stroke-width="${i===50?1.2:1}" ${mj?'':'stroke-dasharray="1 4"'}/>
+  <line x1="${X(0)}" x2="${X(100)}" y1="${Y(i)}" y2="${Y(i)}" stroke="${mj?'#5b3fa8':'#2a1a52'}" stroke-width="${i===50?1.2:1}" ${mj?'':'stroke-dasharray="1 4"'}/>`;
+  if(i%25===0)s+=`<text x="${X(i)}" y="${H-24}" fill="#9a8bc6" font-size="12" font-family="Share Tech Mono,monospace" text-anchor="middle">${i}</text>
+  <text x="${M.l-10}" y="${Y(i)+4}" fill="#9a8bc6" font-size="12" font-family="Share Tech Mono,monospace" text-anchor="end">${i}</text>`}
+ // 等 CPI 线：T·L = c²
+ [20,40,60,80].forEach(c=>{let p='';for(let t=c*c/100;t<=100.01;t+=0.5)p+=(p?'L':'M')+X(t).toFixed(1)+' '+Y(c*c/t).toFixed(1);
+  s+=`<path d="${p}" fill="none" stroke="#fcee0a" stroke-opacity=".28" stroke-dasharray="4 5"/>
+  <text x="${X(100)+4}" y="${Y(c*c/100)+4}" fill="#fcee0a" fill-opacity=".6" font-size="11" font-family="Share Tech Mono,monospace">${c}</text>`});
+ const en=lg()==='en';
+ const ql=(x,y,a,[t1,t2],c)=>`<text x="${x}" y="${y}" text-anchor="${a}" font-family="${en?'Orbitron':'ZCOOL QingKe HuangYou'},sans-serif" font-size="${en?15:20}" font-weight="${en?700:400}" fill="${c}" fill-opacity=".75">${t1}</text>
+  <text x="${x}" y="${y+16}" text-anchor="${a}" font-family="${en?'ZCOOL QingKe HuangYou,sans-serif':'Share Tech Mono,monospace'}" font-size="${en?13:11}" letter-spacing="2" fill="${c}" fill-opacity=".5">${t2}</text>`;
+ s+=ql(X(98),Y(96),'end',L.q[0],'#ff2bd6')+ql(X(2),Y(96),'start',L.q[1],'#ff8a3d')
+  +ql(X(98),Y(12),'end',L.q[2],'#00f0ff')+ql(X(2),Y(12),'start',L.q[3],'#8b5cff');
+ s+=`<line x1="${X(0)}" x2="${X(100)}" y1="${Y(0)}" y2="${Y(0)}" stroke="url(#ax)" stroke-width="2"/>
+ <line x1="${X(0)}" x2="${X(0)}" y1="${Y(0)}" y2="${Y(100)}" stroke="#ff2bd6" stroke-width="2"/>
+ <text x="${X(50)}" y="${H-4}" fill="#00f0ff" font-size="13" font-family="Orbitron,sans-serif" letter-spacing="3" text-anchor="middle">${L.ax[0]}</text>
+ <text transform="translate(14 ${Y(50)}) rotate(-90)" fill="#ff2bd6" font-size="13" font-family="Orbitron,sans-serif" letter-spacing="3" text-anchor="middle">${L.ax[1]}</text>`;
+ chart.querySelector('#bg').innerHTML=s;
+}
+function dots(d,q){
+ const seen=new Set();
+ // 先画低分，高分在上层
+ [...d].sort((a,b)=>a.CPI-b.CPI).forEach(x=>{
+  let g=NODES.get(x.iso);
+  if(!g){g=document.createElementNS(NS,'g');g.setAttribute('class','dot off');
+   g.innerHTML=`<circle r="0"/><text x="0" y="4"></text>`;g.style.transform=`translate(${X(x.T)}px,${Y(x.L)}px)`;
+   g.onmousemove=e=>showTip(e,g.__x);g.onmouseleave=()=>{tip.style.display='none';hot(null)};
+   g.onmouseenter=()=>hot(g.__x.iso,true);g.onclick=()=>go(g.__x.iso);
+   NODES.set(x.iso,g)}
+  dotsG.appendChild(g);g.__x=x;seen.add(x.iso);
+  const r=3.5+x.CPI/MAXALL*10,c=col(x.CPI),hit=matches(x,q);
+  g.style.transform=`translate(${X(x.T)}px,${Y(x.L)}px)`;
+  const ci=g.firstChild;ci.style.r=r+'px';ci.setAttribute('r',r);ci.style.fill=c;ci.style.fillOpacity=.55;ci.style.stroke=c;
+  const tx=g.lastChild;tx.textContent=nm(x);tx.setAttribute('x',r+5);
+  g.classList.remove('off');g.classList.toggle('dim',!hit);g.classList.toggle('lab',hit&&(x.rank<=8||!!q));
+ });
+ NODES.forEach((g,iso)=>{if(!seen.has(iso))g.classList.add('off')});
+}
+function showTip(e,x){
+ const b=(k,v,c)=>`<div class="row"><span>${k}</span><i style="--w:${v}%;--c:${c}"></i><b>${v.toFixed(1)}</b></div>`;
+ tip.innerHTML=`<div class="th">${esc(nm(x))}<span>#${x.rank}</span></div>`+b('T',x.T,'var(--cyan)')+b('L',x.L,'var(--pink)')+b('CPI',x.CPI,col(x.CPI))
+  +`<div class="ft">${x.iso} · ${year} · ${S().vs} ${dHTML(x)}</div>`;
+ tip.style.display='block';
+ const w=tip.offsetWidth,h=tip.offsetHeight;
+ tip.style.left=Math.min(e.clientX+16,innerWidth-w-8)+'px';tip.style.top=Math.min(e.clientY+16,innerHeight-h-8)+'px';
+}
+function hot(iso,fromChart){
+ chart.classList.toggle('focus',!!iso);
+ NODES.forEach((g,k)=>g.classList.toggle('hot',k===iso));
+ if(iso){const g=NODES.get(iso);g&&dotsG.appendChild(g)}
+ if(!fromChart)tb.querySelectorAll('tr').forEach(tr=>tr.classList.toggle('hot',tr.dataset.iso===iso));
+}
+/* 跳到国家明细页 */
+const link=iso=>CPI.link(iso,year);
+function go(iso){stop();location.href=link(iso)}
+
+$q.oninput=render;
+document.querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;
+ sortDir=sortK===k?-sortDir:(k==='country'||k==='rank'?1:-1);sortK=k;render()});
+
+if(window.CPI)load();
+</script>
+</body>
+</html>

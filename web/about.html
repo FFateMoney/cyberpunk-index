@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-zh-title="指数说明 · 赛博朋克指数" data-en-title="Methodology · Cyberpunk Index">指数说明 · 赛博朋克指数</title>
+<script src="lang.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&family=ZCOOL+QingKe+HuangYou&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="cyber.css">
+<style>
+body{font-size:16px;line-height:1.85}
+main{max-width:880px;margin:0 auto;padding:44px 16px 40px;display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
+.kicker{font:13px var(--f-mono);letter-spacing:.24em;color:var(--cyan)}
+h1{margin:6px 0 0;font:400 clamp(44px,9vw,84px)/1.05 var(--f-cn);letter-spacing:.04em;
+ background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+ filter:drop-shadow(0 0 20px rgba(255,43,214,.4))}
+.lead{margin:14px 0 0;font-size:18px;color:#d6c9ff}
+.lead b{color:var(--pink)}
+p{margin:10px 0;color:#ddd3f7}
+b,strong{color:var(--tx)}
+.hl{color:var(--yel)}
+.cut{padding:24px 26px}
+.cut .h2{margin-bottom:12px}
+h3{margin:22px 0 8px;font:400 19px var(--f-cn);letter-spacing:.06em;display:flex;align-items:center;gap:10px}
+h3 .k{font:700 13px var(--f-disp);padding:2px 9px;color:#000}
+h3.t .k{background:var(--cyan);box-shadow:0 0 14px rgba(0,240,255,.6)}
+h3.l .k{background:var(--pink);box-shadow:0 0 14px rgba(255,43,214,.6)}
+h3 small{font:12px var(--f-mono);color:var(--dim);letter-spacing:.12em}
+.formula{position:relative;margin:16px 0;padding:26px 16px 22px;text-align:center;border:1px solid var(--yel);
+ background:repeating-linear-gradient(135deg,rgba(252,238,10,.05) 0 10px,transparent 10px 20px),rgba(0,0,0,.35);
+ box-shadow:inset 0 0 40px rgba(252,238,10,.08),0 0 24px rgba(252,238,10,.15)}
+.formula .f{font:700 clamp(26px,6vw,44px) var(--f-disp);letter-spacing:.06em;color:var(--yel);text-shadow:0 0 22px rgba(252,238,10,.6)}
+.formula .f .t{color:var(--cyan);text-shadow:0 0 18px var(--cyan)}.formula .f .l{color:var(--pink);text-shadow:0 0 18px var(--pink)}
+.formula small{display:block;margin-top:8px;font:13px var(--f-mono);color:var(--dim);letter-spacing:.08em}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:separate;border-spacing:0 3px;margin:10px 0;font-size:15px;line-height:1.5}
+th{font:500 12px var(--f-mono);letter-spacing:.14em;color:var(--dim);text-align:left;padding:6px 12px}
+td{padding:9px 12px;background:rgba(255,255,255,.03);vertical-align:top}
+td.g{font:400 16px var(--f-cn);letter-spacing:.06em;background:rgba(0,240,255,.07);color:var(--cyan);border-left:2px solid var(--cyan)}
+.lt td.g{background:rgba(255,43,214,.07);color:var(--pink);border-left-color:var(--pink)}
+td.src{font:13px var(--f-mono);color:var(--dim)}
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:8px 0;display:grid;gap:8px}
+ol.steps li{counter-increment:s;position:relative;padding:10px 14px 10px 58px;background:rgba(255,255,255,.03);border-left:1px solid var(--line2)}
+ol.steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:12px;top:10px;font:700 18px/1.6 var(--f-disp);
+ color:transparent;-webkit-text-stroke:1px var(--cyan)}
+ol.steps li b{color:var(--cyan)}
+ul.list{list-style:none;padding:0;margin:8px 0}
+ul.list li{position:relative;padding:4px 0 4px 22px}
+ul.list li::before{content:"";position:absolute;left:2px;top:15px;width:8px;height:8px;background:var(--pink);
+ clip-path:polygon(0 0,100% 50%,0 100%);box-shadow:0 0 8px var(--pink)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.stat{padding:12px 14px;border:1px solid var(--line2);background:rgba(0,0,0,.25)}
+.stat .n{font:700 28px var(--f-disp);color:var(--lime);text-shadow:0 0 14px rgba(61,255,168,.5)}
+.stat .d{font-size:13px;color:var(--dim);line-height:1.5}
+.warn{position:relative;padding:18px 20px 14px;background:rgba(252,238,10,.04);border:1px solid rgba(252,238,10,.5)}
+.warn::before{content:"";position:absolute;left:0;right:0;top:0;height:8px;
+ background:repeating-linear-gradient(135deg,var(--yel) 0 10px,#000 10px 20px)}
+.warn .wt{margin-top:6px;font:13px var(--f-mono);letter-spacing:.2em;color:var(--yel)}
+.warn ul.list li::before{background:var(--yel);box-shadow:0 0 8px var(--yel)}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.links a{font:600 15px var(--f-body);padding:8px 16px;border:1px solid var(--cyan);letter-spacing:.04em;
+ clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);transition:.2s}
+.links a:hover{background:var(--cyan);color:#000;box-shadow:0 0 22px var(--cyan)}
+.back{justify-self:start;font:14px var(--f-mono);letter-spacing:.12em}
+html[lang=en] h1{font:900 clamp(34px,8vw,72px)/1.1 var(--f-disp);letter-spacing:.03em}
+html[lang=en] h3{font:700 17px var(--f-disp);letter-spacing:.04em}
+html[lang=en] td.g{font:600 15px var(--f-body);letter-spacing:.04em}
+@media (max-width:600px){
+ .cut{padding:20px 16px}
+ .stats{grid-template-columns:1fr}
+ ol.steps li{padding-left:50px}
+}
+</style>
+</head>
+<body>
+<div class="fx-floor"></div>
+<div class="fx-scan"></div>
+
+<header class="top">
+ <a class="brand" href="index.html"><i class="mk"></i><span>CPI<em>://</em><span class="full">NET</span></span></a>
+ <div class="tr">
+  <nav class="nav"><a href="index.html"><span data-l="zh">榜单</span><span data-l="en">Ranking</span></a><a class="on" href="about.html"><span data-l="zh">指数说明</span><span data-l="en">Method</span></a></nav>
+  <div class="lang" role="group" aria-label="Language"><button data-lang="zh">中</button><button data-lang="en">EN</button></div>
+ </div>
+</header>
+
+<main>
+<header>
+ <div class="kicker"><span data-l="zh">// README.SYS · 方法论</span><span data-l="en">// README.SYS · 指数说明</span></div>
+ <h1><span data-l="zh">指数说明</span><span data-l="en">METHODOLOGY</span></h1>
+ <p class="lead" data-l="zh">赛博朋克指数衡量一个国家有多像<b>"高科技、低生活"</b>（High Tech, Low Life）：技术很先进，普通人的日常却很艰难。</p>
+ <p class="lead" data-l="en">The Cyberpunk Index measures how much a country looks like <b>"High Tech, Low Life"</b>: advanced technology, yet a hard daily life for ordinary people.</p>
+</header>
+
+<section class="cut">
+ <h2 class="h2"><i>01</i><span data-l="zh">怎么算</span><span data-l="en">How it's calculated</span> <small>FORMULA</small></h2>
+ <div class="formula"><div class="f">CPI = √( <span class="t">T</span> × <span class="l">L</span> )</div>
+  <small data-l="zh">T：高科技得分 · L：低生活得分 · 均为 0–100</small><small data-l="en">T: High Tech score · L: Low Life score · both 0–100</small></div>
+ <div data-l="zh">
+ <p>T 和 L 分别由若干指标合成。两者用<b class="hl">几何平均</b>结合，所以只有两边都高才会得高分：科技再发达、生活很好的国家（如北欧），或生活再艰难、科技落后的国家，CPI 都不会高。</p>
+ <p>在榜单散点图里，<b class="hl">右上角</b>就是 T 和 L 都高的国家，也是最"赛博朋克"的地方。</p>
+ </div>
+ <div data-l="en">
+ <p>T and L are each built from several indicators. They are combined with a <b class="hl">geometric mean</b>, so a country only scores high when both are high. A tech leader where life is good (e.g. the Nordics), or a country where life is hard but tech lags behind, will not get a high CPI.</p>
+ <p>In the ranking's scatter plot, the <b class="hl">top-right corner</b> holds the countries where both T and L are high: the most "cyberpunk" places.</p>
+ </div>
+</section>
+
+<section class="cut">
+ <h2 class="h2"><i>02</i><span data-l="zh">指标</span><span data-l="en">Indicators</span> <small>INDICATORS</small></h2>
+ <h3 class="t"><span class="k">T</span><span data-l="zh">高科技</span><span data-l="en">High Tech</span> <small data-l="zh">HIGH TECH</small><small data-l="en">高科技</small></h3>
+ <p data-l="zh">T 回答三个问题：科技渗透到日常生活有多深、投入有多大力度、产出有多大规模。三个子维度等权。</p>
+ <p data-l="en">T answers three questions: how deeply technology reaches daily life, how hard the country invests, and how much it produces. The three sub-dimensions are equally weighted.</p>
+ <div class="tbl" data-l="zh"><table>
+  <tr><th>子维度</th><th>指标</th><th>口径</th><th>来源</th></tr>
+  <tr><td class="g" rowspan="2">渗透</td><td>互联网使用率</td><td>人口占比</td><td class="src">世界银行</td></tr>
+  <tr><td>每百人固定宽带订阅数</td><td>人均</td><td class="src">世界银行</td></tr>
+  <tr><td class="g" rowspan="2">投入强度</td><td>研发支出占 GDP 比重</td><td>占比</td><td class="src">世界银行</td></tr>
+  <tr><td>每百万人口研究人员数</td><td>人均（取对数）</td><td class="src">世界银行</td></tr>
+  <tr><td class="g" rowspan="3">产出规模</td><td>居民专利申请数</td><td>占世界总量份额</td><td class="src">世界银行</td></tr>
+  <tr><td>科技期刊论文数</td><td>占世界总量份额</td><td class="src">世界银行</td></tr>
+  <tr><td>高技术出口总额（美元）</td><td>占世界总量份额</td><td class="src">世界银行</td></tr>
+ </table></div>
+ <div class="tbl" data-l="en"><table>
+  <tr><th>SUB-DIMENSION</th><th>INDICATOR</th><th>MEASURE</th><th>SOURCE</th></tr>
+  <tr><td class="g" rowspan="2">Reach</td><td>Internet users</td><td>% of population</td><td class="src">World Bank</td></tr>
+  <tr><td>Fixed broadband subscriptions per 100 people</td><td>Per capita</td><td class="src">World Bank</td></tr>
+  <tr><td class="g" rowspan="2">Investment</td><td>R&amp;D spending, % of GDP</td><td>Share</td><td class="src">World Bank</td></tr>
+  <tr><td>Researchers per million people</td><td>Per capita (log)</td><td class="src">World Bank</td></tr>
+  <tr><td class="g" rowspan="3">Output</td><td>Resident patent applications</td><td>Share of world total</td><td class="src">World Bank</td></tr>
+  <tr><td>Scientific &amp; technical journal articles</td><td>Share of world total</td><td class="src">World Bank</td></tr>
+  <tr><td>High-tech exports (USD)</td><td>Share of world total</td><td class="src">World Bank</td></tr>
+ </table></div>
+ <p data-l="zh">为什么渗透和投入用"人均/占比"，产出用"总量份额"：科技渗透关心的是每个人的体验，人均才对；而技术实力有规模效应，全球前沿集中在少数大国，所以产出用占世界总量的份额，避免只有几百万人口的小国因为几个数据中心或一小批出口就被算成"科技强国"。</p>
+ <p data-l="en">Why reach and investment are per capita while output is a share of the world total: reach is about each person's experience, so per capita is right. Technological power, though, has economies of scale and the global frontier sits in a few large countries, so output uses the share of the world total. This keeps a country of a few million people from counting as a "tech power" because of a few data centres or a small batch of exports.</p>
+
+ <h3 class="l"><span class="k">L</span><span data-l="zh">低生活</span><span data-l="en">Low Life</span> <small data-l="zh">LOW LIFE · 分数越高，生活压力越大</small><small data-l="en">低生活 · higher score = harder life</small></h3>
+ <p data-l="zh">L 回答七个问题：贫富差距有多大、空气能不能呼吸、安不安全、吃不吃得起、看不看得起病、要工作多久、能活多久。七个维度等权。</p>
+ <p data-l="en">L answers seven questions: how big the gap between rich and poor is, whether the air is breathable, how safe it is, whether people can afford food, whether they can afford to see a doctor, how long they have to work, and how long they live. The seven dimensions are equally weighted.</p>
+ <div class="tbl" data-l="zh"><table class="lt">
+  <tr><th>问题</th><th>指标</th><th>来源</th></tr>
+  <tr><td class="g">不平等</td><td>基尼系数</td><td class="src">世界银行</td></tr>
+  <tr><td class="g">环境</td><td>PM2.5 年均浓度（取对数）</td><td class="src">世界银行</td></tr>
+  <tr><td class="g">安全</td><td>凶杀率（每 10 万人，取对数）</td><td class="src">世界银行（联合国毒品和犯罪问题办公室）</td></tr>
+  <tr><td class="g">吃得起吗</td><td>买不起健康饮食的人口比例</td><td class="src">世界银行 / FAO（经 Our World in Data）</td></tr>
+  <tr><td class="g">看得起病吗</td><td>① 人均自付医疗支出占人均国民收入（GNI）的比例（均按购买力平价）；② 5 岁以下死亡率（取对数）。前者看"贵不贵"，后者看"治得好吗"，互相制衡；两项等权，合起来占 L 的 1/7</td><td class="src">世界银行</td></tr>
+  <tr><td class="g">工作多久</td><td>每名劳动者年均工作小时数</td><td class="src">Our World in Data</td></tr>
+  <tr><td class="g">能活多久</td><td>出生时预期寿命（寿命越短，分越高）</td><td class="src">世界银行</td></tr>
+ </table></div>
+ <div class="tbl" data-l="en"><table class="lt">
+  <tr><th>QUESTION</th><th>INDICATOR</th><th>SOURCE</th></tr>
+  <tr><td class="g">Inequality</td><td>Gini index</td><td class="src">World Bank</td></tr>
+  <tr><td class="g">Environment</td><td>Mean annual PM2.5 exposure (log)</td><td class="src">World Bank</td></tr>
+  <tr><td class="g">Safety</td><td>Homicide rate (per 100,000 people, log)</td><td class="src">World Bank (UNODC)</td></tr>
+  <tr><td class="g">Food</td><td>Share of people who cannot afford a healthy diet</td><td class="src">World Bank / FAO (via Our World in Data)</td></tr>
+  <tr><td class="g">Healthcare</td><td>(1) Out-of-pocket health spending per capita as % of GNI per capita (both PPP); (2) under-5 mortality (log). The first captures cost, the second whether care works, so they check each other; equally weighted, together 1/7 of L</td><td class="src">World Bank</td></tr>
+  <tr><td class="g">Work</td><td>Annual working hours per worker</td><td class="src">Our World in Data</td></tr>
+  <tr><td class="g">Longevity</td><td>Life expectancy at birth (shorter = higher score)</td><td class="src">World Bank</td></tr>
+ </table></div>
+</section>
+
+<section class="cut">
+ <h2 class="h2"><i>03</i><span data-l="zh">合成步骤</span><span data-l="en">Pipeline</span> <small>PIPELINE</small></h2>
+ <ol class="steps" data-l="zh">
+  <li><b>取值：</b>每个国家、每个指标，取快照年份前 5 年（含当年）内最新的一个值。</li>
+  <li><b>份额与取对数：</b>专利、论文、高技术出口先换算成占世界总量的份额（不取对数）；研究人员密度这类分布极度偏斜的指标取对数。</li>
+  <li><b>缩尾：</b>把每个指标的最高和最低各 5% 的国家拉到 5% / 95% 分位，避免极端值主导。</li>
+  <li><b>标准化：</b>线性缩放到 0–100。L 的八项指标都是"越高=生活越差"（预期寿命已反向）。</li>
+  <li><b>加权：</b>T 先在子维度内等权平均，再对 T 的三个子维度等权平均；L 的七个维度等权平均（"看得起病"内部由自付负担和 5 岁以下死亡率两项等权平均）。</li>
+  <li><b>合成：</b>CPI = √(T × L)。</li>
+ </ol>
+ <ol class="steps" data-l="en">
+  <li><b>Values:</b> for each country and indicator, take the latest value within the 5 years up to and including the snapshot year.</li>
+  <li><b>Shares and logs:</b> patents, articles and high-tech exports are first converted to shares of the world total (no log). Heavily skewed indicators such as researcher density are log-transformed.</li>
+  <li><b>Winsorizing:</b> countries in the top and bottom 5% of each indicator are pulled to the 5th / 95th percentile so extremes don't dominate.</li>
+  <li><b>Scaling:</b> linear rescaling to 0–100. All eight L indicators run "higher = worse life" (life expectancy is reversed).</li>
+  <li><b>Weighting:</b> T is averaged equally within each sub-dimension, then equally across its three sub-dimensions. L's seven dimensions are averaged equally (within healthcare, out-of-pocket burden and under-5 mortality are averaged equally).</li>
+  <li><b>Combining:</b> CPI = √(T × L).</li>
+ </ol>
+ <p data-l="zh">得分是<b class="hl">同一快照年里各国之间的相对位置</b>，不是绝对水平。一个国家自己变好了，但别国改善得更快，得分仍可能不降反升。</p>
+ <p data-l="en">Scores show <b class="hl">a country's position relative to others in the same snapshot year</b>, not an absolute level. A country can improve and still see its score rise if others improve faster.</p>
+</section>
+
+<section class="cut">
+ <h2 class="h2"><i>04</i><span data-l="zh">哪些年份、哪些国家</span><span data-l="en">Which years and countries</span> <small>COVERAGE</small></h2>
+ <ul class="list" data-l="zh">
+  <li><b>年份：</b>只有当所有指标在该年当年都有数据时，这一年才可用；缺任何一个指标的年份整体不用，也不人为避开疫情年份。当前可用年份为 2017–2023。</li>
+  <li><b>国家：</b>只包含世界银行意义上的国家和地区。L 的八项指标<b class="hl">必须齐全</b>，缺任何一项的国家不入榜；T 的七项中至少 70%（即至少 5 项）有数据。各年入榜 74–86 个国家，主要受年均工时（约 130 国）、健康饮食（约 150 国）、基尼系数（很多国家并非逐年调查）和近年的凶杀率数据（2023 年仅约 100 国）的覆盖限制。</li>
+ </ul>
+ <ul class="list" data-l="en">
+  <li><b>Years:</b> a year is used only if every indicator has data for that year itself. Years missing any indicator are dropped entirely, and pandemic years are not deliberately skipped. Available years are currently 2017–2023.</li>
+  <li><b>Countries:</b> only countries and territories as defined by the World Bank. All eight L indicators <b class="hl">are required</b>; a country missing any of them is left out. At least 70% of T's seven indicators (i.e. at least 5) must have data. Each year 74–86 countries qualify, limited mainly by coverage of working hours (about 130 countries), healthy diet (about 150), the Gini index (many countries don't survey every year) and recent homicide data (only about 100 countries in 2023).</li>
+ </ul>
+</section>
+
+<section class="cut">
+ <h2 class="h2"><i>05</i><span data-l="zh">结果稳不稳</span><span data-l="en">How robust is it</span> <small>ROBUSTNESS</small></h2>
+ <p data-l="zh">我们用几种不同做法重算，看排名是否大变（Spearman 排名相关性）：</p>
+ <p data-l="en">We recalculated the index several different ways to see whether the ranking changes much (Spearman rank correlation):</p>
+ <div class="stats">
+  <div class="stat"><div class="n">0.94–0.96</div><div class="d"><span data-l="zh">几何平均 → 调和平均</span><span data-l="en">Geometric → harmonic mean</span></div></div>
+  <div class="stat"><div class="n">0.98–0.99</div><div class="d"><span data-l="zh">缩尾改为 1% / 99%</span><span data-l="en">Winsorize at 1% / 99%</span></div></div>
+  <div class="stat"><div class="n">0.85–0.90</div><div class="d"><span data-l="zh">只取 T、L 中较小者</span><span data-l="en">Use only the smaller of T and L</span></div></div>
+ </div>
+ <p data-l="zh">总体排名对合成方式不敏感。另外，T 与 L 在全球范围内呈<b class="hl">负相关</b>（Spearman 约 −0.79 到 −0.86）：越发达的国家通常生活压力越小，所以真正"两边都高"的国家并不多。</p>
+ <p data-l="en">The overall ranking is not sensitive to how T and L are combined. Also, T and L are <b class="hl">negatively correlated</b> worldwide (Spearman about −0.79 to −0.86): more developed countries usually have an easier life, so few countries are truly "high on both".</p>
+</section>
+
+<section class="warn">
+ <div class="wt"><span data-l="zh">⚠ WARNING // 局限，请谨慎解读</span><span data-l="en">⚠ WARNING // LIMITATIONS, READ WITH CARE</span></div>
+ <ul class="list" data-l="zh">
+  <li>L 只有七个维度，没有包含住房负担（目前没有覆盖全球且口径可比的开放数据）、失业、主观幸福感等其他方面，是有意的取舍；它和经济发展水平高度相关，因此 T 与 L 呈较强负相关，"两边都高"的国家很少。</li>
+  <li>"吃得起"的数据从 2017 年起才有，所以榜单只覆盖 2017 年以后。</li>
+  <li>产出规模按总量份额计算，天然偏向人口和经济规模大的国家；小国（如冰岛、芬兰、以色列）的规模得分会被压得很低，真实实力可能被低估。</li>
+  <li>"安全"只用凶杀率：它是各国唯一统计口径基本一致的犯罪指标，但只反映会不会被杀，不含抢劫、诈骗等日常犯罪（其他犯罪率反映的是报案习惯，不可靠）；小国样本少，数值年际波动大。</li>
+  <li>基尼系数很多国家不是每年都有调查，口径（收入或消费）也不尽相同，只取快照年前 5 年内的最新值，可能比较旧；基尼是同一快照内国家之间的相对排位，高收入国家中美国、以色列等得分偏高。</li>
+  <li>各国数据更新年份不一，最老可能是快照年前 4 年的值；低收入国家的工时多为模型估计。</li>
+  <li>世界银行、联合国数据没有把台湾单独列出，因此榜单里没有台湾。</li>
+  <li>这是一个带玩笑性质的构造指数，指标选择和等权方案都带有主观判断，请当作理解数据的角度，而不是严格的社会评价。</li>
+ </ul>
+ <ul class="list" data-l="en">
+  <li>L has only seven dimensions. It deliberately leaves out housing costs (no open data with global coverage and comparable definitions exists yet), unemployment, subjective well-being and more. L is closely tied to economic development, which is why T and L are strongly negatively correlated and few countries are "high on both".</li>
+  <li>Food affordability data only starts in 2017, so the ranking covers 2017 onwards.</li>
+  <li>Output is measured as a share of the world total, which naturally favours countries with large populations and economies. Small countries (e.g. Iceland, Finland, Israel) get very low output scores, so their real strength may be underestimated.</li>
+  <li>"Safety" uses the homicide rate only. It is the one crime indicator measured consistently across countries, but it only reflects the risk of being killed, not everyday crime such as robbery or fraud (other crime rates mostly reflect reporting habits and are unreliable). Small countries have few cases, so their values swing a lot from year to year.</li>
+  <li>Many countries don't run a Gini survey every year, and definitions (income or consumption) differ. Only the latest value within 5 years of the snapshot is used, so it may be dated. Gini is a relative ranking within each snapshot; among high-income countries, the US, Israel and others score relatively high.</li>
+  <li>Countries update their data in different years; the oldest value may be from 4 years before the snapshot. Working hours for low-income countries are mostly model estimates.</li>
+  <li>World Bank and UN data do not list Taiwan separately, so Taiwan is not in the ranking.</li>
+  <li>This is a tongue-in-cheek composite index. The choice of indicators and equal weights involve subjective judgement; treat it as a lens for looking at data, not a rigorous social assessment.</li>
+ </ul>
+</section>
+
+<section class="cut">
+ <h2 class="h2"><i>06</i><span data-l="zh">数据来源</span><span data-l="en">Data sources</span> <small>SOURCES</small></h2>
+ <div class="links">
+  <a href="https://data.worldbank.org/" target="_blank" rel="noopener"><span data-l="zh">世界银行开放数据</span><span data-l="en">World Bank Open Data</span> ↗</a>
+  <a href="https://ourworldindata.org/" target="_blank" rel="noopener">Our World in Data ↗</a>
+ </div>
+</section>
+
+<a class="back" href="index.html"><span data-l="zh">← 返回榜单</span><span data-l="en">← Back to ranking</span></a>
+</main>
+
+<footer class="foot">
+ <span><span data-l="zh">赛博朋克指数 · 高科技 × 低生活</span><span data-l="en">Cyberpunk Index · High Tech × Low Life</span></span>
+ <span class="mono">SYS.OK // END OF TRANSMISSION</span>
+</footer>
+</body>
+</html>

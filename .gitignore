@@ -1,0 +1,7 @@
+# 原始下载和中间表可由 code/run_all.py 重新生成
+data/raw/worldbank/
+data/raw/owid/
+data/raw/ihme/
+data/processed/*.csv
+.claude/
+__pycache__/

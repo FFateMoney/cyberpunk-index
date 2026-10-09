@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>国家明细 · 赛博朋克指数</title>
+<script src="lang.js"></script>
+<script src="names.js"></script>
+<script src="data/cpi.js"></script>
+<script src="common.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&family=ZCOOL+QingKe+HuangYou&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="cyber.css">
+<style>
+.wrap{max-width:1160px;margin:0 auto;padding:24px 16px 40px;display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
+.crumbs{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;font:14px var(--f-mono);letter-spacing:.1em}
+.crumbs select{font:600 15px var(--f-body);color:var(--tx);background:rgba(0,0,0,.4);border:1px solid var(--line2);padding:7px 10px;max-width:100%}
+.crumbs select:focus{outline:1px solid var(--pink)}
+
+/* 首屏 */
+.head{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:24px;align-items:center;padding:28px}
+.kicker{font:13px var(--f-mono);letter-spacing:.24em;color:var(--cyan)}
+.kicker b{color:var(--yel);font-weight:400}
+.cname{margin:8px 0 2px;font:400 clamp(40px,8vw,84px)/1.05 var(--f-cn);letter-spacing:.04em;overflow-wrap:anywhere;
+ background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+ filter:drop-shadow(0 0 20px rgba(255,43,214,.45))}
+html[lang=en] .cname{font:900 clamp(30px,6vw,64px)/1.1 var(--f-disp);letter-spacing:.02em}
+.alt{font:600 17px var(--f-body);color:var(--dim);letter-spacing:.06em}
+.alt span{font-family:var(--f-mono);color:var(--mute);margin-left:10px;letter-spacing:.2em}
+.years{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px}
+.yr{font:600 14px var(--f-disp);letter-spacing:.06em;color:var(--dim);background:rgba(255,255,255,.04);border:1px solid var(--line2);
+ padding:6px 11px;cursor:pointer;clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);transition:.18s}
+.yr:hover:not(:disabled){color:var(--tx);border-color:var(--cyan)}
+.yr[aria-pressed=true]{color:#000;background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 18px rgba(0,240,255,.6)}
+.yr:disabled{opacity:.3;cursor:not-allowed;text-decoration:line-through}
+.facts{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:16px;font:14px var(--f-mono);color:var(--dim)}
+.facts b{color:var(--tx);font-weight:400}
+.up{color:var(--lime)}.dn{color:var(--red)}.eq{color:var(--mute)}.nw{color:var(--yel)}
+.gauge{position:relative;width:100%;max-width:260px;justify-self:center}
+.gauge svg{width:100%;display:block;overflow:visible}
+.gauge .val{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.gauge .val b{font:900 56px/1 var(--f-disp);color:var(--c);text-shadow:0 0 26px var(--c)}
+.gauge .val small{display:block;margin-top:6px;font:12px var(--f-mono);letter-spacing:.24em;color:var(--dim)}
+.gauge .rk{position:absolute;left:0;right:0;bottom:4px;text-align:center;font:700 15px var(--f-disp);color:var(--yel);letter-spacing:.06em}
+
+/* 三张分数卡 */
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.sc{padding:18px 20px}
+.sc .k{font:12px var(--f-mono);letter-spacing:.18em;color:var(--dim)}
+.sc .v{margin-top:6px;font:700 40px/1 var(--f-disp);color:var(--c);text-shadow:0 0 18px var(--c)}
+.sc .v small{font:500 14px var(--f-mono);color:var(--dim);text-shadow:none;margin-left:6px}
+.sc .bar{margin-top:14px;height:6px;background:rgba(255,255,255,.08);position:relative}
+.sc .bar i{position:absolute;left:0;top:0;bottom:0;width:var(--w);background:var(--c);box-shadow:0 0 10px var(--c)}
+.sc .bar u{position:absolute;top:-4px;bottom:-4px;width:2px;left:var(--m);background:#fff;opacity:.7}
+.sc .d{margin-top:10px;font-size:13px;color:var(--mute)}
+
+/* 走势 */
+#trend svg{width:100%;height:auto;display:block;overflow:visible}
+.lg{display:flex;flex-wrap:wrap;gap:16px;font:12px var(--f-mono);letter-spacing:.12em;color:var(--dim)}
+.lg span::before{content:"";display:inline-block;width:16px;height:3px;margin-right:6px;vertical-align:middle;background:var(--c);box-shadow:0 0 8px var(--c)}
+
+/* 维度明细 */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.side-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.side-h .h2 i{background:var(--c);box-shadow:0 0 14px var(--c)}
+.side-h .tot{font:700 30px var(--f-disp);color:var(--c);text-shadow:0 0 16px var(--c)}
+.hint{font-size:13px;color:var(--dim);margin:0 0 14px}
+.grp{margin-top:14px;padding:14px 14px 10px;background:rgba(255,255,255,.025);border-left:2px solid var(--c)}
+.grp-h{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.grp-h .n{font:400 19px var(--f-cn);letter-spacing:.06em;color:var(--c)}
+html[lang=en] .grp-h .n{font:700 15px var(--f-disp)}
+.grp-h .n small{display:block;font:11px var(--f-mono);color:var(--mute);letter-spacing:.14em}
+.grp-h .s{font:700 22px var(--f-disp);color:var(--tx);min-width:52px;text-align:right}
+.meter{height:8px;background:rgba(255,255,255,.07);position:relative;clip-path:polygon(0 0,100% 0,calc(100% - 4px) 100%,0 100%)}
+.meter i{position:absolute;left:0;top:0;bottom:0;width:var(--w);background:linear-gradient(90deg,transparent,var(--c));transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.meter u{position:absolute;top:0;bottom:0;width:2px;left:var(--m);background:#fff;opacity:.6}
+.ind{display:grid;grid-template-columns:minmax(0,1fr) 120px 44px;gap:4px 12px;align-items:center;padding:10px 0 8px;border-top:1px dashed var(--line)}
+.grp-h+.ind{margin-top:10px}
+.ind .nm{font-weight:600;font-size:15px;line-height:1.3}
+.dir{display:inline-block;margin-left:8px;padding:0 6px;font:500 11px/18px var(--f-body);letter-spacing:.04em;vertical-align:2px;
+ border:1px solid currentColor;white-space:nowrap;cursor:help}
+.dir.g{color:var(--cyan);background:rgba(0,240,255,.08)}
+.dir.b{color:#ff6b8f;background:rgba(255,56,100,.1)}
+.legend2 .dir{margin:0 4px 0 0;cursor:default}
+.ind .raw{grid-column:1;font:14px var(--f-mono);color:var(--yel)}
+.ind .raw small{color:var(--dim);margin-left:8px}
+.ind .raw .old{color:#ff8a3d}
+.ind .mt{grid-column:2;grid-row:1/3}
+.ind .meter{height:5px}
+.ind .sv{grid-column:3;grid-row:1/3;text-align:right;font:15px var(--f-mono);color:var(--tx)}
+.ind.na .raw{color:var(--mute)}
+.ind.na .sv{color:var(--mute)}
+.tside{--c:var(--cyan)}.lside{--c:var(--pink)}
+.legend2{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--dim);margin-top:4px}
+.legend2 i{display:inline-block;width:2px;height:12px;background:#fff;opacity:.7;vertical-align:middle;margin-right:6px}
+.legend2 b{color:#ff8a3d;font-weight:500}
+
+/* 上下一名 */
+.pn{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pn a{display:block;padding:16px 20px;color:var(--tx)}
+.pn a:hover{color:var(--yel)}
+.pn .k{font:12px var(--f-mono);letter-spacing:.18em;color:var(--dim)}
+.pn .v{font:700 20px var(--f-disp);margin-top:4px;overflow-wrap:anywhere}
+html:not([lang=en]) .pn .v{font:400 22px var(--f-cn)}
+.pn .nx{text-align:right}
+.pn .ghost{visibility:hidden}
+.miss{padding:60px 20px;text-align:center;font:16px var(--f-mono);color:var(--dim)}
+.miss b{display:block;font:900 40px var(--f-disp);color:var(--pink);margin-bottom:10px;text-shadow:0 0 20px var(--pink)}
+
+@media (max-width:900px){
+ .head{grid-template-columns:1fr}
+ .gauge{max-width:220px}
+ .cols{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+ .head{padding:22px 16px}
+ .trio{grid-template-columns:1fr}
+ .ind{grid-template-columns:minmax(0,1fr) 70px 40px}
+ .pn{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="fx-floor"></div>
+<div class="fx-scan"></div>
+
+<header class="top">
+ <a class="brand" href="index.html"><i class="mk"></i><span>CPI<em>://</em><span class="full">NET</span></span></a>
+ <div class="tr">
+  <nav class="nav"><a href="index.html"><span data-l="zh">榜单</span><span data-l="en">Ranking</span></a><a href="about.html"><span data-l="zh">指数说明</span><span data-l="en">Method</span></a></nav>
+  <div class="lang" role="group" aria-label="Language"><button data-lang="zh">中</button><button data-lang="en">EN</button></div>
+ </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<footer class="foot">
+ <span data-l="zh">数据：世界银行、Our World in Data。得分是同一快照年内各国之间的相对位置（0–100）。 <a href="about.html">指数定义与局限 →</a></span>
+ <span data-l="en">Data: World Bank, Our World in Data. Scores are relative positions among countries in the same snapshot year (0–100). <a href="about.html">Definition &amp; limits →</a></span>
+ <span class="mono">SYS.OK // END OF TRANSMISSION</span>
+</footer>
+
+<script>
+const app=document.getElementById('app');
+const {D,YEARS,col,esc,name:nm}=window.CPI||{};
+const KI=D?Object.fromEntries(D.keys.map((k,i)=>[k,i])):{};
+const lg=()=>LANG.get(),en=()=>lg()==='en';
+const P=new URLSearchParams(location.search);
+let iso=(P.get('iso')||'').toUpperCase(),year=P.get('year');
+
+/* 维度结构：子维度在 D.subs 中的下标 + 所含指标 */
+const SIDES={
+ T:[{sub:0,id:'penetration',ks:['internet','broadband']},{sub:1,id:'innovation_input',ks:['rd_gdp','researchers']},
+    {sub:2,id:'output_scale',ks:['patents','sci_articles','hightech_usd']}],
+ L:[{sub:3,id:'inequality',ks:['gini']},{sub:4,id:'environment',ks:['pm25']},{sub:5,id:'safety',ks:['homicide']},
+    {sub:6,id:'food',ks:['unaff_diet']},{sub:7,id:'health',ks:['oop_health','u5_mortality']},{sub:8,id:'hours',ks:['work_hours']},
+    {sub:9,id:'longevity',ks:['life_exp']}]};
+const SUBN={penetration:['渗透','Reach','PENETRATION'],innovation_input:['投入强度','Investment','INPUT'],output_scale:['产出规模','Output','OUTPUT SCALE'],
+ inequality:['不平等','Inequality','INEQUALITY'],environment:['环境','Environment','ENVIRONMENT'],safety:['安全','Safety','SAFETY'],
+ food:['吃得起吗','Food','FOOD'],health:['看得起病吗','Healthcare','HEALTH'],hours:['工作多久','Work hours','HOURS'],longevity:['活得久吗','Longevity','LONGEVITY']};
+
+/* 指标名称与原始值格式 */
+const f=(v,d)=>v.toLocaleString(en()?'en-US':'zh-CN',{minimumFractionDigits:d,maximumFractionDigits:d});
+const shareTxt=s=>s==null?'':(en()?` · ${fmtShare(s)} of world`:` · 占世界 ${fmtShare(s)}`);
+const fmtShare=s=>{const p=s*100;return(p>=1?f(p,1):p>=0.01?f(p,2):'<0.01')+'%'};
+/* 数值越高意味着什么。13 项方向一致：越高 → 得分越高 → 越赛博朋克（见 code/config.py）；
+   T 侧越高是好事（科技强），L 侧越高是坏事（生活难），据此着色 */
+const DIR={internet:['越普及','more online'],broadband:['越普及','more connected'],rd_gdp:['投入越多','more R&D'],
+ researchers:['人才越多','more researchers'],patents:['产出越多','more output'],sci_articles:['产出越多','more output'],
+ hightech_usd:['出口越多','more exports'],unaff_diet:['越吃不起','less affordable food'],oop_health:['看病越贵','costlier care'],life_exp:['寿命越短','shorter lives'],u5_mortality:['孩子越难养大','higher child mortality'],
+ work_hours:['工作越久','longer hours'],gini:['越不平等','more unequal'],pm25:['空气越差','dirtier air'],homicide:['越不安全','less safe']};
+const dirTag=(k,side)=>{const g=side==='T',d=DIR[k];
+ const rev=k==='life_exp';   // 反向指标：数值越低 → 得分越高
+ const tip=rev?(en()?'Lower value = shorter lives (harder life) = higher score':'数值越低 = 寿命越短（生活越难）= 得分越高')
+  :en()?`Higher value = ${d[1]} (${g?'stronger tech':'harder life'}) = higher score`:`数值越高 = ${d[0]}（${g?'科技越强':'生活越难'}）= 得分越高`;
+ return`<span class="dir ${g?'g':'b'}" title="${tip}">${rev?'▼':'▲'} ${en()?d[1]:d[0]}</span>`};
+const IND={
+ internet:['互联网使用率','Internet users',v=>f(v,1)+(en()?'% of population':'% 人口')],
+ broadband:['固定宽带订阅','Fixed broadband',v=>f(v,1)+(en()?' per 100 people':' / 百人')],
+ rd_gdp:['研发支出','R&D spending',v=>f(v,2)+'% GDP'],
+ researchers:['研究人员密度','Researchers',v=>f(v,0)+(en()?' per million':' 人 / 百万人')],
+ patents:['居民专利申请','Resident patents',(v,s)=>f(v,0)+(en()?' filed':' 件')+shareTxt(s)],
+ sci_articles:['科技期刊论文','Sci. & tech articles',(v,s)=>f(v,0)+(en()?' articles':' 篇')+shareTxt(s)],
+ hightech_usd:['高技术出口','High-tech exports',(v,s)=>(en()?(v>=1e9?'$'+f(v/1e9,1)+' bn':'$'+f(v/1e6,1)+' m'):(v>=1e8?f(v/1e8,1)+' 亿美元':f(v/1e4,0)+' 万美元'))+shareTxt(s)],
+ unaff_diet:['买不起健康饮食','Can\'t afford a healthy diet',v=>f(v,1)+(en()?'% of population':'% 人口')],
+ oop_health:['自付医疗负担','Out-of-pocket health burden',v=>f(v,2)+(en()?'% of GNI per capita':'% 人均收入')],
+ life_exp:['预期寿命','Life expectancy',v=>f(v,1)+(en()?' years':' 岁')],
+ u5_mortality:['5 岁以下死亡率','Under-5 mortality',v=>f(v,1)+(en()?' per 1,000 births':' ‰（每千名活产）')],
+ work_hours:['年均工作时长','Annual working hours',v=>f(v,0)+(en()?' h / worker / yr':' 小时 / 人 / 年')],
+ gini:['基尼系数','Gini index',v=>f(v,1)],
+ pm25:['PM2.5 年均浓度','PM2.5 exposure',v=>f(v,1)+' µg/m³'],
+ homicide:['凶杀率','Homicide rate',v=>f(v,2)+(en()?' per 100k':' / 10 万人')]};
+
+const S={zh:{back:'← 返回榜单',pick:'切换国家',kick:'// NODE PROFILE · 国家明细',rank:(r,n)=>`第 ${r} 名 / 共 ${n} 国`,
+  vs:'较上年',sy:'快照年份',miss:'没有这个国家的数据',missd:'它可能不在榜单里（L 八项指标需齐全才入榜）。',
+  t:'T · 高科技',l:'L · 低生活',c:'CPI · 赛博朋克指数',med:m=>`本年全部入榜国家中位数 ${f(m,1)}`,
+  trend:'历年走势',dims:'维度明细',th:'得分 0–100，越高 = 科技越强',lh:'得分 0–100，越高 = 生活压力越大',
+  lgMed:'本年各国中位数',lgDir:['数值越高 = 科技越强','数值越高 = 生活越难'],lgOld:'橙色年份 = 数据早于快照年',na:'无数据',dy:'数据年',
+  prev:'← 上一名',next:'下一名 →',yrs:'历年排名'},
+ en:{back:'← Back to ranking',pick:'Switch country',kick:'// NODE PROFILE',rank:(r,n)=>`#${r} of ${n} countries`,
+  vs:'vs prev. year',sy:'Snapshot',miss:'No data for this country',missd:'It may not be ranked (all eight L indicators are required).',
+  t:'T · HIGH TECH',l:'L · LOW LIFE',c:'CPI · CYBERPUNK INDEX',med:m=>`Median of all ranked countries: ${f(m,1)}`,
+  trend:'Trend',dims:'Breakdown',th:'Score 0–100, higher = stronger tech',lh:'Score 0–100, higher = harder life',
+  lgMed:'Median of all countries this year',lgDir:['higher = stronger tech','higher = harder life'],lgOld:'Orange year = data older than the snapshot',na:'No data',dy:'data',
+  prev:'← Previous',next:'Next →',yrs:'Rank by year'}};
+const T=()=>S[lg()];
+
+const median=a=>{a=a.filter(v=>v!=null).sort((x,y)=>x-y);if(!a.length)return null;const m=a.length>>1;return a.length%2?a[m]:(a[m-1]+a[m])/2};
+
+/* 每年的中位数（总分、子维度、各指标） */
+const MED={};
+(YEARS||[]).forEach(y=>{const rows=Object.values(D.data[y]);
+ MED[y]={T:median(rows.map(r=>r[0])),L:median(rows.map(r=>r[1])),CPI:median(rows.map(r=>r[2])),
+  sub:D.subs.map((_,i)=>median(rows.map(r=>r[4][i]))),ind:D.keys.map((_,i)=>median(rows.map(r=>r[5][i]?.[3])))}});
+
+function yearsOf(c){return YEARS.filter(y=>D.data[y][c])}
+function rankDelta(c,y){const i=YEARS.indexOf(y);if(i<1)return'';const p=D.data[YEARS[i-1]][c];
+ if(!p)return`<span class="nw">${en()?'NEW':'新入榜'}</span>`;const d=p[3]-D.data[y][c][3];
+ return d>0?`<span class="up">▲${d}</span>`:d<0?`<span class="dn">▼${-d}</span>`:`<span class="eq">＝</span>`}
+
+function gauge(v,c){const R=100,C=2*Math.PI*R,arc=C*.75,len=arc*Math.min(v,100)/100;
+ return`<svg viewBox="-120 -120 240 240"><defs><linearGradient id="gg" x1="0" x2="1" y1="1" y2="0"><stop offset="0" stop-color="#00f0ff"/><stop offset=".5" stop-color="#ff2bd6"/><stop offset="1" stop-color="#fcee0a"/></linearGradient>
+  <filter id="gl"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <g transform="rotate(135)"><circle r="${R}" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="14" stroke-dasharray="${arc} ${C}"/>
+  <circle r="${R}" fill="none" stroke="url(#gg)" stroke-width="14" stroke-dasharray="${len} ${C}" filter="url(#gl)"/>
+  ${[...Array(31)].map((_,i)=>{const a=i/30*270*Math.PI/180;return`<line x1="${Math.cos(a)*84}" y1="${Math.sin(a)*84}" x2="${Math.cos(a)*(i%5?80:76)}" y2="${Math.sin(a)*(i%5?80:76)}" stroke="#5f527f"/>`}).join('')}</g></svg>`}
+
+function trend(c){
+ const W=860,H=260,M={l:40,r:20,t:16,b:40},ys=YEARS,X=i=>M.l+(ys.length<2?0:i/(ys.length-1))*(W-M.l-M.r),Y=v=>H-M.b-v/100*(H-M.t-M.b);
+ let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${T().trend}">`;
+ [0,25,50,75,100].forEach(v=>s+=`<line x1="${M.l}" x2="${W-M.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v%50?'#2a1a52':'#5b3fa8'}" ${v%50?'stroke-dasharray="1 4"':''}/><text x="${M.l-8}" y="${Y(v)+4}" fill="#9a8bc6" font-size="11" font-family="Share Tech Mono,monospace" text-anchor="end">${v}</text>`);
+ ys.forEach((y,i)=>{const r=D.data[y][c];s+=`<text x="${X(i)}" y="${H-20}" fill="${y===year?'#00f0ff':'#9a8bc6'}" font-size="12" font-family="Share Tech Mono,monospace" text-anchor="middle">${y}</text>
+  <text x="${X(i)}" y="${H-4}" fill="${r?'#fcee0a':'#5f527f'}" font-size="11" font-family="Orbitron,sans-serif" text-anchor="middle">${r?'#'+r[3]:'—'}</text>`});
+ const sel=YEARS.indexOf(year);s+=`<rect x="${X(sel)-18}" y="${M.t}" width="36" height="${H-M.t-M.b}" fill="#00f0ff" fill-opacity=".06" stroke="#00f0ff" stroke-opacity=".3" stroke-dasharray="2 4"/>`;
+ [[0,'#00f0ff'],[1,'#ff2bd6'],[2,'#fcee0a']].forEach(([k,cl])=>{let p='',seg=false;
+  ys.forEach((y,i)=>{const r=D.data[y][c];if(!r){seg=false;return}p+=(seg?'L':'M')+X(i).toFixed(1)+' '+Y(r[k]).toFixed(1);seg=true});
+  s+=`<path d="${p}" fill="none" stroke="${cl}" stroke-width="${k===2?3:2}" style="filter:drop-shadow(0 0 6px ${cl})"/>`;
+  ys.forEach((y,i)=>{const r=D.data[y][c];if(r)s+=`<circle cx="${X(i)}" cy="${Y(r[k])}" r="${y===year?5:3}" fill="#06020e" stroke="${cl}" stroke-width="2"><title>${y} · ${['T','L','CPI'][k]} ${r[k].toFixed(1)}</title></circle>`})});
+ return s+'</svg>'}
+
+function render(){
+ const t=T(),r=D.data[year]&&D.data[year][iso];
+ document.title=(r?nm(iso)+' · ':'')+(en()?'Cyberpunk Index':'赛博朋克指数');
+ if(!r){app.innerHTML=`<a class="mono" href="index.html">${t.back}</a><section class="cut miss"><b>NO SIGNAL</b>${t.miss}${iso?` · ${esc(iso)}`:''}<br>${t.missd}</section>`;return}
+ const [Tv,Lv,C,rank,sub,ind]=r,n=Object.keys(D.data[year]).length,m=MED[year];
+ const order=Object.entries(D.data[year]).sort((a,b)=>a[1][3]-b[1][3]).map(e=>e[0]),pos=order.indexOf(iso);
+ const prev=order[pos-1],next=order[pos+1];
+ const card=(k,v,c,med)=>`<div class="cut sc" style="--c:${c}"><div class="k">${k}</div><div class="v">${v.toFixed(1)}<small>/ 100</small></div>
+  <div class="bar" style="--w:${v}%;--m:${med}%"><i></i><u></u></div><div class="d">${t.med(med)}</div></div>`;
+ const side=(sd,title,hint,v)=>`<section class="cut ${sd==='T'?'tside':'lside'}">
+  <div class="side-h"><h2 class="h2"><i>${sd}</i>${title}</h2><span class="tot">${v.toFixed(1)}</span></div>
+  <p class="hint">${hint}</p>
+  ${SIDES[sd].map(g=>{const sv=sub[g.sub],sm=m.sub[g.sub],nmz=SUBN[g.id];
+   return`<div class="grp"><div class="grp-h"><span class="n">${en()?nmz[1]:nmz[0]}<small>${nmz[2]}</small></span>
+    <div class="meter" style="--w:${sv??0}%;--m:${sm}%"><i></i><u></u></div><span class="s">${sv==null?'—':sv.toFixed(1)}</span></div>
+    ${g.ks.map(k=>{const d=ind[KI[k]],L=IND[k],mi=m.ind[KI[k]];
+     if(!d)return`<div class="ind na"><div class="nm">${en()?L[1]:L[0]}${dirTag(k,sd)}</div><div class="raw">${t.na}</div><div class="mt"></div><div class="sv">—</div></div>`;
+     const[raw,share,dy,score]=d;
+     return`<div class="ind"><div class="nm">${en()?L[1]:L[0]}${dirTag(k,sd)}</div>
+      <div class="raw">${L[2](raw,share)}<small class="${dy<+year?'old':''}">${t.dy} ${dy}</small></div>
+      <div class="mt"><div class="meter" style="--w:${score}%;--m:${mi}%"><i></i><u></u></div></div>
+      <div class="sv">${score.toFixed(1)}</div></div>`}).join('')}</div>`}).join('')}
+ </section>`;
+ const opts=order.map(c=>`<option value="${c}" ${c===iso?'selected':''}>#${D.data[year][c][3]} ${esc(nm(c))}</option>`).join('');
+ const altName=en()?CPI.zhName(iso):D.names[iso];
+ app.innerHTML=`
+ <div class="crumbs"><a href="index.html">${t.back}</a>
+  <label><span class="sr" hidden>${t.pick}</span><select id="pick" aria-label="${t.pick}">${opts}</select></label></div>
+ <section class="cut head">
+  <div><div class="kicker">${t.kick} · <b>${year}</b></div>
+   <h1 class="cname">${esc(nm(iso))}</h1>
+   <div class="alt">${esc(altName)}<span>${iso}</span></div>
+   <div class="facts"><span>${t.rank(rank,n)}</span><span>${t.vs} ${rankDelta(iso,year)||'—'}</span></div>
+   <div class="years">${YEARS.map(y=>`<button class="yr" data-y="${y}" aria-pressed="${y===year}" ${D.data[y][iso]?'':'disabled'}>${y}</button>`).join('')}</div>
+  </div>
+  <div class="gauge" style="--c:${col(C)}">${gauge(C)}<div class="val"><div><b>${C.toFixed(1)}</b><small>CPI</small></div></div><div class="rk">#${rank}</div></div>
+ </section>
+ <section class="trio">${card(t.t,Tv,'var(--cyan)',m.T)}${card(t.l,Lv,'var(--pink)',m.L)}${card(t.c,C,col(C),m.CPI)}</section>
+ <section class="cut">
+  <div class="side-h"><h2 class="h2"><i>01</i>${t.trend} <small>TREND</small></h2>
+   <div class="lg"><span style="--c:#00f0ff">T</span><span style="--c:#ff2bd6">L</span><span style="--c:#fcee0a">CPI</span><span style="--c:transparent">#N = ${t.yrs}</span></div></div>
+  <div id="trend">${trend(iso)}</div>
+ </section>
+ <div class="side-h"><h2 class="h2"><i>02</i>${t.dims} <small>BREAKDOWN</small></h2>
+  <div class="legend2"><span><span class="dir g">▲</span>${t.lgDir[0]}</span><span><span class="dir b">▲</span>${t.lgDir[1]}</span><span><i></i>${t.lgMed}</span><span><b>${t.dy} 20XX</b> ${t.lgOld}</span></div></div>
+ <div class="cols">${side('T',en()?'High Tech':'高科技',t.th,Tv)}${side('L',en()?'Low Life':'低生活',t.lh,Lv)}</div>
+ <nav class="pn">
+  ${prev?`<a class="cut" href="?iso=${prev}&year=${year}"><div class="k">${t.prev} · #${D.data[year][prev][3]}</div><div class="v">${esc(nm(prev))}</div></a>`:'<span class="ghost"></span>'}
+  ${next?`<a class="cut nx" href="?iso=${next}&year=${year}"><div class="k">#${D.data[year][next][3]} · ${t.next}</div><div class="v">${esc(nm(next))}</div></a>`:'<span class="ghost"></span>'}
+ </nav>`;
+ app.querySelectorAll('.yr').forEach(b=>b.onclick=()=>{year=b.dataset.y;sync();render()});
+ document.getElementById('pick').onchange=e=>{iso=e.target.value;sync();render();scrollTo({top:0,behavior:'smooth'})};
+}
+// 地址栏与当前选择保持一致，方便分享
+function sync(){history.replaceState(null,'',`?iso=${iso}&year=${year}`)}
+
+// 年份缺省或该国当年不在榜：取该国最近一年
+if(window.CPI){
+ if(!CPI.row(year,iso)){const ys=yearsOf(iso);year=ys.length?ys.at(-1):YEARS.at(-1)}
+ render();
+ document.addEventListener('langchange',render);
+}
+</script>
+</body>
+</html>
